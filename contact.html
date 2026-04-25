@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Virtue</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --whatsapp: #25d366;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .contact-card {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 10; /* Ensures buttons stay on top */
+        }
+
+        h1 {
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        /* --- THE BUTTONS --- */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            padding: 18px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 20; /* High priority for clicking */
+        }
+
+        /* WhatsApp Style */
+        .whatsapp {
+            background-color: transparent;
+            color: var(--whatsapp);
+            border: 1px solid var(--whatsapp);
+        }
+
+        .whatsapp:hover {
+            background-color: var(--whatsapp);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
+        }
+
+        /* Hotline Style */
+        .hotline {
+            background-color: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .hotline:hover {
+            background-color: var(--gold);
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Email Style */
+        .email {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .email:hover {
+            background-color: #e0e0e0;
+        }
+
+        .contact-btn i {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        /* Footer links */
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #777;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover { color: #fff; }
+
+        /* Animation */
+        .contact-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contact-card">
+        <h1>Connect with Virtue</h1>
+        
+        <div class="btn-group">
+            <a href="https://wa.me/2347079740708" class="contact-btn whatsapp">
+                <i class="fa fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+
+            <a href="tel:+2347079740708" class="contact-btn hotline">
+                <i class="fa fa-phone"></i> Call Hotline
+            </a>
+
+            <a href="mailto: alanoziewc1@gmail.com" class="contact-btn email">
+                <i class="fa fa-envelope"></i> Email Support
+            </a>
+        </div>
+
+        <a href="index.html" class="back-link">
+            <i class="fa fa-arrow-left"></i> Back to Virtue Store
+        </a>
+    </div>
+
+</body>
+</html>

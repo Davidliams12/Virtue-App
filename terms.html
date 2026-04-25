@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions | Virtue</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        :root {
+            --primary: #d4af37; /* Gold */
+            --dark: #121212;
+            --text: #333;
+            --light-bg: #fdfdfd;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--light-bg);
+            color: var(--text);
+        }
+
+        /* Header Section */
+        .legal-header {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        .legal-header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .update-date {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        /* Content Container */
+        .content-container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 25px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--dark);
+            margin: 30px 0 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i { color: var(--primary); font-size: 1.2rem; }
+
+        p { margin-bottom: 20px; font-size: 1.05rem; text-align: justify; }
+
+        ul { margin-bottom: 20px; padding-left: 20px; }
+        li { margin-bottom: 10px; }
+
+        /* Back Button */
+        .back-home {
+            display: inline-block;
+            margin-top: 40px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            border: 2px solid var(--primary);
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .back-home:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Entrance Animation */
+        .content-container {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .content-container { padding: 20px; margin: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="legal-header">
+        <h1>Terms & Conditions</h1>
+        <p class="update-date">Last Updated: April 18, 2026</p>
+    </header>
+
+    <div class="content-container">
+        <p>Welcome to <strong>Virtue</strong>. By accessing or using our website, you agree to be bound by the following terms and conditions. Please read them carefully.</p>
+
+        <h2><i class="fa fa-user-circle"></i> 1. Use of the Platform</h2>
+        <p>Virtue provides an e-commerce platform for purchasing high-quality goods. You agree to use this site only for lawful purposes and in a way that does not infringe the rights of others.</p>
+
+        <h2><i class="fa fa-shopping-bag"></i> 2. Product Information</h2>
+        <p>We strive for absolute accuracy in our product descriptions. However, Virtue does not warrant that product descriptions or other content are error-free. If a product offered is not as described, your sole remedy is to return it in unused condition.</p>
+
+        <h2><i class="fa fa-credit-card"></i> 3. Payments and Billing</h2>
+        <p>All payments are processed securely. By providing a payment method, you represent that you are authorized to use that method and authorize Virtue to charge the total amount of your order.</p>
+
+        <h2><i class="fa fa-lock"></i> 4. Privacy and Security</h2>
+        <p>Your privacy is of the utmost importance. Our collection and use of personal information are governed by our Privacy Policy, which is incorporated into these Terms by reference.</p>
+
+        <h2><i class="fa fa-gavel"></i> 5. Intellectual Property</h2>
+        <p>All content included on this site, such as text, graphics, logos, and software, is the property of Virtue or its content suppliers and is protected by international copyright laws.</p>
+
+        <center>
+            <a href="index.html" class="back-home"><i class="fa fa-home"></i> Return to Store</a>
+        </center>
+    </div>
+
+    <div style="height: 50px;"></div>
+
+</body>
+</html>

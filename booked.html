@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtue | My Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --bg-deep: #05070a;
+            --card-bg: #11141b;
+            --glass: rgba(255, 255, 255, 0.03);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+            --success: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg-deep); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+
+        /* --- Header --- */
+        .booked-header {
+            padding: 20px 5%;
+            background: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { color: var(--gold); font-weight: 900; font-size: 1.4rem; text-decoration: none; letter-spacing: 2px; }
+        .home-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .home-link:hover { color: var(--gold); }
+
+        /* --- Main Container --- */
+        .container { max-width: 800px; margin: 40px auto; padding: 0 5%; }
+        .page-title { margin-bottom: 30px; }
+        .page-title h1 { font-size: 1.8rem; color: #fff; margin-bottom: 5px; }
+        .page-title p { color: var(--text-dim); font-size: 0.9rem; }
+
+        /* --- Order Cards --- */
+        .order-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .order-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass);
+        }
+        .order-id { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .order-date { display: block; font-size: 0.9rem; color: var(--text-main); margin-top: 4px; }
+        
+        .status-pill {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status-delivered {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+        }
+
+        /* --- Item List --- */
+        .booked-items { margin-bottom: 20px; }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .item-detail { display: flex; align-items: center; gap: 12px; }
+        .item-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #fff; }
+        .item-name { font-weight: 500; }
+        .item-qty { color: var(--text-dim); font-size: 0.8rem; }
+
+        /* --- Summary --- */
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--glass);
+        }
+        .total-label { color: var(--text-dim); font-size: 0.9rem; }
+        .total-amount { color: var(--gold); font-size: 1.2rem; font-weight: 800; }
+
+        /* --- Empty State --- */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .empty-state i { font-size: 4rem; color: var(--border); margin-bottom: 20px; }
+        .shop-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--gold);
+            color: #000;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 500px) {
+            .order-header { flex-direction: column; gap: 10px; }
+            .status-pill { align-self: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="booked-header">
+        <a href="index.html" class="logo">VIRTUE</a>
+        <a href="index.html" class="home-link"><i class="fas fa-home"></i> Back to Shop</a>
+    </header>
+
+    <div class="container">
+        <div class="page-title">
+            <h1>My Booked Orders</h1>
+            <p>Track your purchases and delivery status</p>
+        </div>
+
+        <div id="booked-container">
+            <p style="text-align: center; color: var(--text-dim);">Syncing with server...</p>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5DaRQRagBw4SygXkVykC_l_CN3GAYt_k",
+            authDomain: "virtue-mall.firebaseapp.com",
+            projectId: "virtue-mall",
+            storageBucket: "virtue-mall.firebasestorage.app",
+            messagingSenderId: "1065970390704",
+            appId: "1:1065970390704:web:cde54a37805923292c4d75"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function renderBookedOrders() {
+            const booked = JSON.parse(localStorage.getItem("virtue_booked")) || [];
+            const container = document.getElementById('booked-container');
+
+            if (booked.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h2>No orders found</h2>
+                        <p>You haven't placed any orders yet.</p>
+                        <a href="index.html" class="shop-btn">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Reverse for newest first
+            const sortedBooked = [...booked].reverse();
+
+            // Render initial cards from local storage
+            container.innerHTML = sortedBooked.map(order => {
+                const date = new Date(order.createdAt).toLocaleDateString('en-GB', {
+                    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                return `
+                    <div class="order-card" id="card-${order.orderId}">
+                        <div class="order-header">
+                            <div>
+                                <span class="order-id">Order ID: #${order.orderId.substring(0, 8)}</span>
+                                <span class="order-date">${date}</span>
+                            </div>
+                            <span class="status-pill" id="status-${order.orderId}">${order.status || 'Booked'}</span>
+                        </div>
+
+                        <div class="booked-items">
+                            ${(order.originalItems || order.items).map(item => {
+                                const img = Array.isArray(item.images) ? item.images[0] : (item.image || item.images);
+                                const displayImg = img || 'https://via.placeholder.com/50?text=Item';
+                                
+                                return `
+                                    <div class="item-row">
+                                        <div class="item-detail">
+                                            <img src="${displayImg}" class="item-img">
+                                            <div>
+                                                <div class="item-name">${item.name}</div>
+                                                <div class="item-qty">Quantity: ${item.qty || item.quantity}</div>
+                                            </div>
+                                        </div>
+                                        <div class="item-price">₦${Number(item.price).toLocaleString()}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <div class="order-footer">
+                            <span class="total-label">Paid Amount</span>
+                            <span class="total-amount">${order.totalAmount}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Now, sync each card with live data from Firebase
+            sortedBooked.forEach(order => {
+                db.collection("orders").doc(order.orderId).onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const liveData = doc.data();
+                        const statusEl = document.getElementById(`status-${order.orderId}`);
+                        
+                        if (liveData.status === "Delivered") {
+                            statusEl.innerHTML = "Delivered - Transaction Closed";
+                            statusEl.classList.add('status-delivered');
+                        } else {
+                            statusEl.innerHTML = liveData.status || "Booked";
+                            statusEl.classList.remove('status-delivered');
+                        }
+                    }
+                });
+            });
+        }
+
+        window.onload = renderBookedOrders;
+    </script>
+</body>
+</html>

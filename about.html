@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Virtue</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        :root {
+            --primary: #10b981; /* Emerald Green */
+            --dark: #1f2937;    /* Charcoal */
+            --light: #f3f4f6;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Entrance Animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: auto;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--dark) 0%, #111827 100%);
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: center;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .icon-box i {
+            font-size: 4rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .mission-box {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: -50px; /* Overlap effect */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+
+        /* Interactive Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #9ca3af;
+            text-align: center;
+            font-size: 11px;
+            flex: 1;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            transform: translateY(-5px); /* Lift active icon */
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin: 40px 0 100px 0;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+
+    <section class="header-section">
+        <div class="icon-box">
+            <i class="fa fa-diamond"></i>
+        </div>
+        <h1>Virtue</h1>
+        <p style="opacity: 0.8;">Where Quality is a Habit</p>
+    </section>
+
+    <div class="container">
+        <div class="mission-box">
+            <h2>Our Purpose</h2>
+            <p>At <strong>Virtue</strong>, we believe that software and commerce should serve the user with absolute transparency. We aren't just building a platform; we are building a standard of excellence.</p>
+            
+            <h2>The Experience</h2>
+            <p>Every line of code and every product selection is handled with care to ensure your journey with us is seamless, secure, and satisfying.</p>
+        </div>
+
+        <center>
+            <a href="index.html" class="back-btn">
+                <i class="fa fa-shopping-bag"></i> Continue Shopping
+            </a>
+        </center>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="index.html" class="nav-item">
+            <i class="fa fa-search"></i>
+            <span>Search</span>
+        </a>
+        <a href="about.html" class="nav-item active">
+            <i class="fa fa-info-circle"></i>
+            <span>About</span>
+        </a>
+    </nav>
+
+</body>
+</html>

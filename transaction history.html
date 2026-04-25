@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | Virtue</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --bg-deep: #05070a;
+            --card-bg: #11141b;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+            --booked: #f68b1e;
+            --delivered: #2ecc71;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg-deep); color: var(--text-main); min-height: 100vh; }
+
+        header {
+            padding: 20px 5%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        header i { color: var(--gold); cursor: pointer; font-size: 1.2rem; }
+        header h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-main); }
+
+        .container { max-width: 800px; margin: 30px auto; padding: 0 5%; }
+
+        .transaction-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        .trans-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-id { font-size: 0.75rem; color: var(--gold); font-weight: 800; display: block; margin-bottom: 4px; }
+        .order-date { font-size: 0.8rem; color: var(--text-dim); }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .status-Booked { background: rgba(246, 139, 30, 0.1); color: var(--booked); border: 1px solid var(--booked); }
+        .status-Delivered { background: rgba(46, 204, 113, 0.1); color: var(--delivered); border: 1px solid var(--delivered); }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 12px;
+        }
+        .item-row i { color: var(--gold); font-size: 0.9rem; }
+        .item-name { font-size: 0.9rem; color: var(--text-main); flex: 1; }
+
+        .trans-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+        .total-amount { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+
+        .loader { text-align: center; padding: 50px; color: var(--gold); font-size: 1.2rem; }
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-dim); }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.2; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fas fa-arrow-left" onclick="window.location.href='index.html'"></i>
+        <h1>Transaction History</h1>
+    </header>
+
+    <div class="container" id="history-box">
+        <div class="loader"><i class="fas fa-spinner fa-spin"></i></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5DaRQRagBw4SygXkVykC_l_CN3GAYt_k",
+            authDomain: "virtue-mall.firebaseapp.com",
+            projectId: "virtue-mall",
+            storageBucket: "virtue-mall.firebasestorage.app",
+            messagingSenderId: "1065970390704",
+            appId: "1:1065970390704:web:cde54a37805923292c4d75"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function loadHistory() {
+            const container = document.getElementById('history-box');
+            
+            // Correctly fetching from the object defined in checkout.html
+            const userData = JSON.parse(localStorage.getItem("virtue_user_data")) || {};
+            const currentName = userData.name;
+
+            if (!currentName) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-circle"></i>
+                        <p>No user profile found.<br>Orders will appear here once you place them.</p>
+                    </div>`;
+                return;
+            }
+
+            db.collection("orders")
+                .where("customerName", "==", currentName)
+                .onSnapshot((snapshot) => {
+                    if (snapshot.empty) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <p>No transactions found for ${currentName}</p>
+                            </div>`;
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const o = doc.data();
+                        const date = o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-GB', {
+                            day: 'numeric', month: 'short', year: 'numeric'
+                        }) : 'Recent';
+
+                        let itemsList = '';
+                        if(o.items) {
+                            o.items.forEach(item => {
+                                itemsList += `
+                                    <div class="item-row">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        <span class="item-name">${item.name} <small style="color:var(--text-dim)">(x${item.qty})</small></span>
+                                    </div>`;
+                            });
+                        }
+
+                        html += `
+                            <div class="transaction-card">
+                                <div class="trans-header">
+                                    <div>
+                                        <span class="order-id">ORDER #${doc.id.substring(0,8).toUpperCase()}</span>
+                                        <span class="order-date">${date}</span>
+                                    </div>
+                                    <span class="status-badge status-${o.status}">${o.status}</span>
+                                </div>
+                                <div class="items-area">${itemsList}</div>
+                                <div class="trans-footer">
+                                    <span style="font-size: 0.8rem; color: var(--text-dim);">Paid Total</span>
+                                    <span class="total-amount">${o.totalAmount}</span>
+                                </div>
+                            </div>`;
+                    });
+                    container.innerHTML = html;
+                }, (err) => {
+                    console.error(err);
+                    container.innerHTML = `<p style="text-align:center; color:red;">Connection error</p>`;
+                });
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>

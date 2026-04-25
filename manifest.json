@@ -11,10 +11,12 @@
   "icons": [
     {
       "src": "Ikon.jpg",
-      "sizes": "192x192",
+      "sizes": "192x192 512x512",
       "type": "image/jpeg",
       "purpose": "any"
-    },
+    }
+  ]
+,
     {
       "src": "Ikon.jpg",
       "sizes": "512x512",

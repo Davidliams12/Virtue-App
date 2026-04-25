@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtue | Your Bag</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-cyan: #00f2ff;
+            --gold: #d4af37;
+            --bg-dark: #05070a;
+            --card-bg: #11141b;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
+
+        /* --- Header --- */
+        .header {
+            padding: 15px 5%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header a { color: var(--text-main); text-decoration: none; font-size: 1.2rem; }
+        .header h3 { font-size: 1.1rem; letter-spacing: 1px; color: var(--gold); }
+
+        /* --- Layout --- */
+        .cart-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 5%;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .cart-container { grid-template-columns: 1fr; }
+        }
+
+        /* --- Cart Items --- */
+        .cart-items-section { display: flex; flex-direction: column; gap: 15px; }
+        
+        .cart-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .cart-item:hover { border-color: var(--primary-cyan); }
+
+        .item-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            background: #fff;
+            object-fit: contain;
+            padding: 5px;
+            cursor: pointer; /* Change cursor for preview */
+        }
+
+        .item-info { flex: 1; }
+        .item-info h4 { font-size: 1rem; margin-bottom: 5px; color: var(--white); }
+        .item-info p { color: var(--gold); font-weight: 700; font-size: 0.9rem; }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.3);
+            width: fit-content;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            color: var(--primary-cyan);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .remove-btn {
+            color: #ff4d4d;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+        .remove-btn:hover { transform: scale(1.1); }
+
+        /* --- Summary Section --- */
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .summary-card h2 { font-size: 1.2rem; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .total-row {
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+            transition: 0.3s;
+        }
+
+        .checkout-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(212, 175, 55, 0.3); }
+
+        /* --- Image Preview Modal --- */
+        .preview-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .preview-modal img {
+            max-width: 90%;
+            max-height: 80%;
+            border: 2px solid var(--primary-cyan);
+            border-radius: 10px;
+        }
+        .close-preview {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: white; font-size: 2rem; cursor: pointer;
+        }
+
+        /* --- Empty State --- */
+        .empty-cart {
+            text-align: center;
+            padding: 100px 20px;
+            grid-column: 1 / -1;
+        }
+        .empty-cart i { font-size: 4rem; color: var(--border); margin-bottom: 20px; }
+        .shop-now-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--primary-cyan);
+            color: #000;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <a href="index.html"><i class="fas fa-chevron-left"></i></a>
+    <h3>MY SHOPPING BAG</h3>
+    <div></div> 
+</header>
+
+<div class="cart-container" id="cart-container">
+    </div>
+
+<div class="preview-modal" id="imagePreview">
+    <span class="close-preview" onclick="closePreview()">&times;</span>
+    <img id="modalImg" src="">
+</div>
+
+<script>
+    function loadCart() {
+        // Fetching from virtue_cart which is used across the app
+        const cart = JSON.parse(localStorage.getItem("virtue_cart")) || [];
+        const container = document.getElementById('cart-container');
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h2>Your bag is empty</h2>
+                    <p>Looks like you haven't added anything yet.</p>
+                    <a href="index.html" class="shop-now-btn">START SHOPPING</a>
+                </div>
+            `;
+            return;
+        }
+
+        let cartHTML = `<div class="cart-items-section">`;
+        let subtotal = 0;
+
+        cart.forEach((item, index) => {
+            const price = Number(item.price);
+            subtotal += price * item.qty;
+            
+            // Check if item images is an array or a single string
+            const displayImg = Array.isArray(item.images) ? item.images[0] : item.image;
+
+            cartHTML += `
+                <div class="cart-item">
+                    <img src="${displayImg}" class="item-img" alt="${item.name}" onclick="openPreview('${displayImg}')">
+                    <div class="item-info">
+                        <h4>${item.name}</h4>
+                        <p>₦${price.toLocaleString()}</p>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="updateQty(${index}, -1)"><i class="fas fa-minus"></i></button>
+                            <span>${item.qty}</span>
+                            <button class="qty-btn" onclick="updateQty(${index}, 1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <i class="fas fa-trash-alt remove-btn" onclick="removeItem(${index})"></i>
+                </div>
+            `;
+        });
+
+        cartHTML += `</div>`;
+
+        // Summary Card
+        cartHTML += `
+            <div class="summary-card">
+                <h2>Summary</h2>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>₦${subtotal.toLocaleString()}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Fee</span>
+                    <span>₦2,500</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total</span>
+                    <span>₦${(subtotal + 2500).toLocaleString()}</span>
+                </div>
+                <button class="checkout-btn" onclick="location.href='checkout2.html'">
+                    PROCEED TO CHECKOUT
+                </button>
+            </div>
+        `;
+
+        container.innerHTML = cartHTML;
+    }
+
+    function updateQty(index, change) {
+        let cart = JSON.parse(localStorage.getItem("virtue_cart"));
+        cart[index].qty += change;
+
+        if (cart[index].qty < 1) cart[index].qty = 1; 
+
+        localStorage.setItem("virtue_cart", JSON.stringify(cart));
+        loadCart();
+    }
+
+    function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem("virtue_cart"));
+        cart.splice(index, 1);
+        localStorage.setItem("virtue_cart", JSON.stringify(cart));
+        loadCart();
+    }
+
+    /* PREVIEW FUNCTIONS */
+    function openPreview(imgSrc) {
+        document.getElementById('modalImg').src = imgSrc;
+        document.getElementById('imagePreview').style.display = 'flex';
+    }
+
+    function closePreview() {
+        document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    // Initialize
+    window.onload = loadCart;
+</script>
+
+</body>
+</html>

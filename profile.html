@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtue | Profile Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-cyan: #00f2ff;
+            --accent-orange: #f68b1e;
+            --bg-dark: #05070a;
+            --card-bg: #11141b;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --white: #ffffff;
+            --input-focus: rgba(0, 242, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- Topbar --- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--white);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar a { color: #000; text-decoration: none; font-size: 1.1rem; }
+        .topbar h3 { color: #000; font-size: 1.2rem; font-weight: 700; }
+
+        /* --- Profile Header --- */
+        .profile-header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(to bottom, rgba(0, 242, 255, 0.05), transparent);
+        }
+
+        .profile-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .change-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* --- Info Section --- */
+        .main-content {
+            padding: 0 20px 100px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid #1e293b;
+            padding: 20px;
+        }
+
+        .info-group {
+            position: relative;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--primary-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .editable-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .value-text {
+            font-size: 1rem;
+            color: var(--text-main);
+            width: 90%;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 5px 0;
+            transition: all 0.3s;
+        }
+
+        /* Select styling to match inputs */
+        select.value-text {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .value-text:focus {
+            color: var(--white);
+            background: var(--input-focus);
+            padding-left: 10px;
+            border-radius: 4px;
+        }
+
+        .edit-icon {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+
+        .edit-icon:hover {
+            color: var(--primary-cyan);
+        }
+
+        .address-note {
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            margin-top: 8px;
+            display: block;
+            font-style: italic;
+        }
+
+        /* --- Preview Overlay --- */
+        .preview {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .preview img {
+            width: 80%;
+            max-width: 350px;
+            border-radius: 10px;
+            border: 2px solid var(--primary-cyan);
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: white; font-size: 1.5rem; cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <a href="index.html"><i class="fas fa-chevron-left"></i></a>
+    <h3>Profile Settings</h3>
+</div>
+
+<div class="profile-header">
+    <img id="profileImg" class="profile-img" src="https://via.placeholder.com/150" onclick="showPreview(this)">
+    <br>
+    <input type="file" id="fileInput" hidden accept="image/*" onchange="changeImage(event)">
+    <button class="change-btn" onclick="uploadImage()">
+        <i class="fas fa-pen"></i> EDIT PHOTO
+    </button>
+</div>
+
+<div class="main-content">
+    <div class="info-card">
+        <div class="info-group">
+            <span class="label">Full Name</span>
+            <div class="editable-wrapper">
+                <input type="text" id="input-name" class="value-text" value="Dr. Wisdom David" onblur="saveData()" spellcheck="false">
+                <i class="fas fa-pencil-alt edit-icon" onclick="focusField('input-name')"></i>
+            </div>
+        </div>
+
+        <div class="info-group">
+            <span class="label">Username</span>
+            <div class="editable-wrapper">
+                <input type="text" id="input-username" class="value-text" value="@wisdom_pmt" onblur="saveData()" spellcheck="false">
+                <i class="fas fa-pencil-alt edit-icon" onclick="focusField('input-username')"></i>
+            </div>
+        </div>
+        
+        <div class="info-group">
+            <span class="label">Phone no</span>
+            <div class="editable-wrapper">
+                <input type="tel" id="input-tel" class="value-text" value="07079740708" onblur="saveData()" spellcheck="false" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)">
+                <i class="fas fa-pencil-alt edit-icon" onclick="focusField('input-tel')"></i>
+            </div>
+        </div>
+
+        <div class="info-group">
+            <span class="label">Email Address</span>
+            <div class="editable-wrapper">
+                <input type="email" id="input-email" class="value-text" value="wisdom@virtue.com" onblur="saveData()" spellcheck="false">
+                <i class="fas fa-pencil-alt edit-icon" onclick="focusField('input-email')"></i>
+            </div>
+        </div>
+
+        <div class="info-group">
+            <span class="label">Residential Address</span>
+            <div class="editable-wrapper">
+                <input type="text" id="input-address" class="value-text" placeholder="Enter your address" onblur="saveData()" spellcheck="false">
+                <i class="fas fa-pencil-alt edit-icon" onclick="focusField('input-address')"></i>
+            </div>
+        </div>
+
+        <div class="info-group">
+            <span class="label">City</span>
+            <div class="editable-wrapper">
+                <input type="text" id="input-city" class="value-text" placeholder="e.g. Onitsha" onblur="saveData()" spellcheck="false">
+                <i class="fas fa-pencil-alt edit-icon" onclick="focusField('input-city')"></i>
+            </div>
+        </div>
+
+        <div class="info-group">
+            <span class="label">State</span>
+            <div class="editable-wrapper">
+                <select id="input-state" class="value-text" onchange="saveData()">
+                    <option value="">Select State</option>
+                    <option value="Abia">Abia</option>
+                    <option value="Adamawa">Adamawa</option>
+                    <option value="Akwa Ibom">Akwa Ibom</option>
+                    <option value="Anambra">Anambra</option>
+                    <option value="Bauchi">Bauchi</option>
+                    <option value="Bayelsa">Bayelsa</option>
+                    <option value="Benue">Benue</option>
+                    <option value="Borno">Borno</option>
+                    <option value="Cross River">Cross River</option>
+                    <option value="Delta">Delta</option>
+                    <option value="Ebonyi">Ebonyi</option>
+                    <option value="Edo">Edo</option>
+                    <option value="Ekiti">Ekiti</option>
+                    <option value="Enugu">Enugu</option>
+                    <option value="FCT">FCT - Abuja</option>
+                    <option value="Gombe">Gombe</option>
+                    <option value="Imo">Imo</option>
+                    <option value="Jigawa">Jigawa</option>
+                    <option value="Kaduna">Kaduna</option>
+                    <option value="Kano">Kano</option>
+                    <option value="Katsina">Katsina</option>
+                    <option value="Kebbi">Kebbi</option>
+                    <option value="Kogi">Kogi</option>
+                    <option value="Kwara">Kwara</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Nasarawa">Nasarawa</option>
+                    <option value="Niger">Niger</option>
+                    <option value="Ogun">Ogun</option>
+                    <option value="Ondo">Ondo</option>
+                    <option value="Osun">Osun</option>
+                    <option value="Oyo">Oyo</option>
+                    <option value="Plateau">Plateau</option>
+                    <option value="Rivers">Rivers</option>
+                    <option value="Sokoto">Sokoto</option>
+                    <option value="Taraba">Taraba</option>
+                    <option value="Yobe">Yobe</option>
+                    <option value="Zamfara">Zamfara</option>
+                </select>
+                <i class="fas fa-chevron-down edit-icon"></i>
+            </div>
+            <small class="address-note">Make sure you update your address once you change location.</small>
+        </div>
+    </div>
+</div>
+
+<div class="preview" id="previewBox">
+    <span class="close-preview" onclick="closePreview()"><i class="fas fa-times"></i></span>
+    <img id="previewImg">
+</div>
+
+<script>
+    function focusField(id) {
+        const field = document.getElementById(id);
+        field.focus();
+        const val = field.value;
+        field.value = '';
+        field.value = val;
+    }
+
+    function saveData() {
+        const profileData = {
+            name: document.getElementById('input-name').value,
+            username: document.getElementById('input-username').value,
+            email: document.getElementById('input-email').value,
+            phone: document.getElementById('input-tel').value,
+            address: document.getElementById('input-address').value,
+            city: document.getElementById('input-city').value,
+            state: document.getElementById('input-state').value
+        };
+        localStorage.setItem("virtue_user_data", JSON.stringify(profileData));
+    }
+
+    window.onload = function() {
+        const savedData = localStorage.getItem("virtue_user_data");
+        if(savedData) {
+            const data = JSON.parse(savedData);
+            document.getElementById('input-name').value = data.name || "";
+            document.getElementById('input-username').value = data.username || "";
+            document.getElementById('input-email').value = data.email || "";
+            document.getElementById('input-tel').value = data.phone || "07079740708";
+            document.getElementById('input-address').value = data.address || "";
+            document.getElementById('input-city').value = data.city || "";
+            document.getElementById('input-state').value = data.state || "";
+        }
+
+        const savedImg = localStorage.getItem("virtue_profile_pic");
+        if(savedImg) {
+            document.getElementById("profileImg").src = savedImg;
+        }
+    }
+
+    function uploadImage() { document.getElementById("fileInput").click(); }
+
+    function changeImage(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(){
+            localStorage.setItem("virtue_profile_pic", reader.result);
+            document.getElementById("profileImg").src = reader.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    function showPreview(img) {
+        document.getElementById("previewImg").src = img.src;
+        document.getElementById("previewBox").style.display = "flex";
+    }
+    function closePreview() { document.getElementById("previewBox").style.display = "none"; }
+</script>
+
+</body>
+</html>

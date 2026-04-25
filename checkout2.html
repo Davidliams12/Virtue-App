@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtue | Secure Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --primary-cyan: #00f2ff;
+            --accent-orange: #f68b1e;
+            --bg-deep: #05070a;
+            --card-bg: #11141b;
+            --glass: rgba(255, 255, 255, 0.03);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg-deep); color: var(--text-main); padding-bottom: 50px; }
+
+        /* --- Header --- */
+        .checkout-header {
+            padding: 20px 5%;
+            background: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { color: var(--gold); font-weight: 900; font-size: 1.4rem; text-decoration: none; letter-spacing: 2px; }
+        .back-link { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; }
+
+        /* --- Layout --- */
+        .checkout-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 0 5%;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-container { grid-template-columns: 1fr; }
+            .checkout-sidebar { order: -1; }
+        }
+
+        h2 { font-size: 1rem; margin-bottom: 20px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- Forms --- */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
+        
+        .editable-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+        .editable-input:focus { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+
+        .location-note {
+            font-size: 0.8rem;
+            color: var(--accent-orange);
+            margin-bottom: 15px;
+            display: block;
+            font-style: italic;
+        }
+        
+         .payment-methods { display: flex; gap: 10px; margin-top: 10px; }
+        .method-card {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .method-card i { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+        .method-card.active { border-color: var(--gold); background: rgba(212, 175, 55, 0.1); color: var(--gold); }
+
+        /* --- Order Summary --- */
+        .item-list { max-height: 300px; overflow-y: auto; margin-bottom: 15px; }
+        .item-preview { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--glass); }
+        .item-preview img { width: 50px; height: 50px; object-fit: contain; background: #fff; border-radius: 8px; }
+        .item-info span { display: block; font-size: 0.85rem; }
+
+        .summary-details { border-top: 1px solid var(--border); padding-top: 15px; }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; color: var(--text-dim); }
+        .summary-total { 
+            display: flex; justify-content: space-between; 
+            margin-top: 10px; font-weight: 700; font-size: 1.3rem; color: var(--gold);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+            transition: 0.3s;
+        }
+        .checkout-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(212, 175, 55, 0.3); }
+        .checkout-btn:disabled { background: var(--text-dim); cursor: not-allowed; box-shadow: none; }
+
+        .secure-badge { text-align: center; font-size: 0.75rem; color: var(--text-dim); margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <header class="checkout-header">
+        <a href="index.html" class="logo">VIRTUE</a>
+        <a href="cart.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Bag</a>
+    </header>
+    
+    <div class="checkout-container">
+        <div class="checkout-main">
+            <h2><i class="fas fa-truck"></i> Shipping Details</h2>
+            <div class="glass-card">
+                <span class="location-note">(Go through this credentials and make sure it suits your current location)</span>
+                
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="cust-name" class="editable-input" placeholder="Name">
+                </div>
+                
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="cust-phone" class="editable-input" 
+                           placeholder="08012345678" 
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)">
+                </div>
+                
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="cust-email" class="editable-input" placeholder="Email">
+                </div>
+
+                <div class="input-group">
+                    <label>Delivery Address</label>
+                    <input type="text" id="cust-address" class="editable-input" placeholder="Street Address">
+                </div>
+                
+                <div class="input-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="input-group">
+                        <label>City</label>
+                        <input type="text" id="cust-city" placeholder="City">
+                    </div>
+                    <div class="input-group">
+                        <label>State</label>
+                        <select id="cust-state">
+                            <option value="">Select State</option>
+                            <option value="Abia">Abia</option>
+                            <option value="Adamawa">Adamawa</option>
+                            <option value="Akwa Ibom">Akwa Ibom</option>
+                            <option value="Anambra">Anambra</option>
+                            <option value="Bauchi">Bauchi</option>
+                            <option value="Bayelsa">Bayelsa</option>
+                            <option value="Benue">Benue</option>
+                            <option value="Borno">Borno</option>
+                            <option value="Cross River">Cross River</option>
+                            <option value="Delta">Delta</option>
+                            <option value="Ebonyi">Ebonyi</option>
+                            <option value="Edo">Edo</option>
+                            <option value="Ekiti">Ekiti</option>
+                            <option value="Enugu">Enugu</option>
+                            <option value="FCT">FCT - Abuja</option>
+                            <option value="Gombe">Gombe</option>
+                            <option value="Imo">Imo</option>
+                            <option value="Jigawa">Jigawa</option>
+                            <option value="Kaduna">Kaduna</option>
+                            <option value="Kano">Kano</option>
+                            <option value="Katsina">Katsina</option>
+                            <option value="Kebbi">Kebbi</option>
+                            <option value="Kogi">Kogi</option>
+                            <option value="Kwara">Kwara</option>
+                            <option value="Lagos">Lagos</option>
+                            <option value="Nasarawa">Nasarawa</option>
+                            <option value="Niger">Niger</option>
+                            <option value="Ogun">Ogun</option>
+                            <option value="Ondo">Ondo</option>
+                            <option value="Osun">Osun</option>
+                            <option value="Oyo">Oyo</option>
+                            <option value="Plateau">Plateau</option>
+                            <option value="Rivers">Rivers</option>
+                            <option value="Sokoto">Sokoto</option>
+                            <option value="Taraba">Taraba</option>
+                            <option value="Yobe">Yobe</option>
+                            <option value="Zamfara">Zamfara</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Payment Method</h2>
+            <div class="glass-card">
+                <div class="payment-methods">
+                    <div class="method-card active" onclick="setPayment('card')">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Card</span>
+                    </div>
+                    <div class="method-card" onclick="setPayment('transfer')">
+                        <i class="fas fa-university"></i>
+                        <span>Transfer</span>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+                    <i class="fas fa-shield-alt"></i> Payments secured via Paystack / Flutterwave
+                </div>
+            </div>
+        </div>
+
+        <div class="checkout-sidebar">
+            <div class="glass-card">
+                <h2>Order Summary</h2>
+                <div id="checkout-items" class="item-list"></div>
+                <div class="summary-details">
+                    <div class="summary-item">
+                        <span>Subtotal</span>
+                        <span id="subtotal">₦0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Shipping Fee</span>
+                        <span>₦2,500</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="final-total">₦0</span>
+                    </div>
+                </div>
+                <button class="checkout-btn" id="orderBtn" onclick="handleCheckout()">Complete Order</button>
+                <div class="secure-badge">
+                    <i class="fas fa-lock"></i> SSL Encrypted & Secure
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5DaRQRagBw4SygXkVykC_l_CN3GAYt_k",
+            authDomain: "virtue-mall.firebaseapp.com",
+            projectId: "virtue-mall",
+            storageBucket: "virtue-mall.firebasestorage.app",
+            messagingSenderId: "1065970390704",
+            appId: "1:1065970390704:web:cde54a37805923292c4d75"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        window.onload = function() {
+            const savedUser = JSON.parse(localStorage.getItem("virtue_user_data")) || {};
+            
+            if(savedUser.name) document.getElementById('cust-name').value = savedUser.name;
+            if(savedUser.email) document.getElementById('cust-email').value = savedUser.email;
+            if(savedUser.phone) document.getElementById('cust-phone').value = savedUser.phone;
+            if(savedUser.address) document.getElementById('cust-address').value = savedUser.address;
+            if(savedUser.city) document.getElementById('cust-city').value = savedUser.city;
+            if(savedUser.state) document.getElementById('cust-state').value = savedUser.state;
+            
+            renderCheckoutItems();
+        };
+
+        function renderCheckoutItems() {
+            const cart = JSON.parse(localStorage.getItem("virtue_cart")) || [];
+            const container = document.getElementById('checkout-items');
+            let subtotal = 0;
+
+            if(cart.length === 0) {
+                container.innerHTML = "<p style='text-align:center; color:var(--text-dim);'>Your bag is empty</p>";
+                return;
+            }
+
+            container.innerHTML = cart.map(item => {
+                const itemPrice = Number(item.price);
+                subtotal += (itemPrice * item.qty);
+                const imgUrl = Array.isArray(item.images) ? item.images[0] : (item.image || item.images);
+                
+                return `
+                    <div class="item-preview">
+                        <img src="${imgUrl}" alt="${item.name}">
+                        <div class="item-info">
+                            <span style="color: white; font-weight: 600;">${item.name}</span>
+                            <span style="color: var(--gold);">₦${itemPrice.toLocaleString()} × ${item.qty}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('subtotal').innerText = "₦" + subtotal.toLocaleString();
+            document.getElementById('final-total').innerText = "₦" + (subtotal + 2500).toLocaleString();
+        }
+
+        async function handleCheckout() {
+            const btn = document.getElementById('orderBtn');
+            const cart = JSON.parse(localStorage.getItem("virtue_cart")) || [];
+            
+            const name = document.getElementById('cust-name').value;
+            const email = document.getElementById('cust-email').value;
+            const address = document.getElementById('cust-address').value;
+            const phone = document.getElementById('cust-phone').value;
+            const city = document.getElementById('cust-city').value;
+            const state = document.getElementById('cust-state').value;
+
+            if(!name || !email || !address || !phone || !city || !state || cart.length === 0) {
+                alert("Please ensure all profile information is filled and verified.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Processing Order...";
+
+            const cleanCart = cart.map(i => ({ name: i.name, price: i.price, qty: i.qty }));
+
+            const orderPayload = {
+                customerName: name,
+                customerEmail: email,
+                customerPhone: phone,
+                shippingAddress: `${address}, ${city}, ${state}`,
+                items: cleanCart,
+                totalAmount: document.getElementById('final-total').innerText,
+                status: "Booked",
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                const docRef = await db.collection("orders").add(orderPayload);
+                const orderID = docRef.id;
+
+                let booked = JSON.parse(localStorage.getItem("virtue_booked")) || [];
+                booked.push({ orderId: orderID, ...orderPayload, originalItems: cart });
+                localStorage.setItem("virtue_booked", JSON.stringify(booked));
+
+                localStorage.removeItem("virtue_cart");
+                alert("Order Successful!");
+                window.location.href = "booked.html";
+
+            } catch (error) {
+                console.error("Order Error:", error);
+                alert("Could not complete order. Please try again.");
+                btn.disabled = false;
+                btn.innerText = "Complete Order";
+            }
+        }
+
+        function setPayment(type) {
+            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

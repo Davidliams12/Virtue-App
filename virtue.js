@@ -19,6 +19,7 @@ let allProducts = [];
 let toastTimer;
 let currentImgIndex = 0;
 let currentProductImages = [];
+let deferredPrompt; // NEW: For App Install
 
 // --- NEW: Hero Slider Variables ---
 const heroImages = [
@@ -27,6 +28,43 @@ const heroImages = [
     "003.jpg"
 ]; 
 let heroIndex = 0;
+
+// --- NEW: App Install Logic ---
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome from showing the default mini-infobar
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    
+    // Check if the user has already seen the prompt this session
+    const hasSeenPrompt = sessionStorage.getItem('virtue_install_prompted');
+    
+    if (!hasSeenPrompt) {
+        // Automatically show the install toast after a 5-second delay
+        setTimeout(() => {
+            showInstallToast();
+            sessionStorage.setItem('virtue_install_prompted', 'true');
+        }, 5000);
+    }
+});
+
+function showInstallToast() {
+    const t = document.getElementById('toast'); 
+    if(!t || !deferredPrompt) return;
+    
+    t.innerHTML = `Install Virtue App for a better experience? <span id="install-now" style="color:var(--accent-gold); font-weight:bold; cursor:pointer; margin-left:10px;">INSTALL</span>`;
+    t.classList.add('show');
+    
+    document.getElementById('install-now').onclick = async () => {
+        t.classList.remove('show');
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted the Virtue install');
+        }
+        deferredPrompt = null;
+    };
+}
 
 // --- Firebase Data Loading ---
 
@@ -262,7 +300,7 @@ function syncTheme() {
 window.onload = () => {
     loadCloudProducts();
     listenToOrders();
-    listenForNotifications(); // Added Notification Dot Logic
+    listenForNotifications(); 
     syncTheme();
     
     // Start Hero Slider
@@ -274,5 +312,10 @@ window.onload = () => {
     const savedPic = localStorage.getItem('virtue_profile_pic');
     if(savedPic && document.getElementById('profile-img')) {
         document.getElementById('profile-img').src = savedPic;
+    }
+
+    // Register Service Worker for PWA (App install requirement)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
     }
 };

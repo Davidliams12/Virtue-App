@@ -1,17 +1,25 @@
 {
-  "name": "Virtue",
-  "short_name": "virtue",
+  "name": "Virtue Luxury Store",
+  "short_name": "Virtue",
+  "description": "Premium e-commerce platform for luxury products.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#FF007A",
-  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "scope": "./",
   "icons": [
+    {
+      "src": "Ikon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
     {
       "src": "Ikon.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
